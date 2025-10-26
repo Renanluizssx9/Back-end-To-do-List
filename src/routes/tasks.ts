@@ -1,66 +1,41 @@
 import { Router } from "express";
 import { Task } from "../models/task";
+import { authMiddleware, AuthRequest } from "../middlewares/jwtMiddleware";
 
 const router = Router();
 
-router.get("/", async (req, res) => {
-  try {
-    const tasks = await Task.find();
-    res.json(tasks);
-  } catch (err) {
-    res.status(500).json({ error: "Erro ao buscar tarefas" });
-  }
+// Listar tarefas do usuário
+router.get("/", authMiddleware, async (req: AuthRequest, res) => {
+  const tasks = await Task.find({ user: req.userId });
+  res.json(tasks);
 });
 
-router.post("/", async (req, res) => {
-  try {
-    const { title } = req.body;
-    if (!title || title.trim() === "") {
-      return res.status(400).json({ error: "O título é obrigatório" });
-    }
+// Criar tarefa
+router.post("/", authMiddleware, async (req: AuthRequest, res) => {
+  const { title } = req.body;
+  if (!title) return res.status(400).json({ error: "O título é obrigatório" });
 
-    const newTask = await Task.create({ title });
-    res.status(201).json(newTask);
-    console.log(newTask)
-  } catch (err) {
-    res.status(500).json({ error: "Erro ao criar tarefa" });
-    
-  }
+  const task = await Task.create({ title, user: req.userId });
+  res.status(201).json(task);
 });
 
-router.put("/:id", async (req, res) => {
-  try {
-    const { title, completed } = req.body;
-    const updatedTask = await Task.findByIdAndUpdate(
-      req.params.id,
-      { title, completed },
-      { new: true }
-      
-
-    );
-    // console.log(title);
-      console.log(completed);
-
-    if (!updatedTask) {
-      return res.status(404).json({ error: "Tarefa não encontrada" });
-    }
-
-    res.json(updatedTask);
-  } catch (err) {
-    res.status(500).json({ error: "Erro ao atualizar tarefa" });
-  }
+// Atualizar tarefa
+router.put("/:id", authMiddleware, async (req: AuthRequest, res) => {
+  const { title, completed } = req.body;
+  const task = await Task.findOneAndUpdate(
+    { _id: req.params.id, user: req.userId },
+    { title, completed },
+    { new: true }
+  );
+  if (!task) return res.status(404).json({ error: "Tarefa não encontrada" });
+  res.json(task);
 });
 
-router.delete("/:id", async (req, res) => {
-  try {
-    const deleted = await Task.findByIdAndDelete(req.params.id);
-    if (!deleted) {
-      return res.status(404).json({ error: "Tarefa não encontrada" });
-    }
-    res.status(204).send();
-  } catch (err) {
-    res.status(500).json({ error: "Erro ao excluir tarefa" });
-  }
+// Deletar tarefa
+router.delete("/:id", authMiddleware, async (req: AuthRequest, res) => {
+  const task = await Task.findOneAndDelete({ _id: req.params.id, user: req.userId });
+  if (!task) return res.status(404).json({ error: "Tarefa não encontrada" });
+  res.status(204).send();
 });
 
 export default router;
