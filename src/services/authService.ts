@@ -1,0 +1,62 @@
+import bcrypt from "bcryptjs";
+import jwt, { SignOptions, Secret } from "jsonwebtoken";
+import User from "../models/userModel";
+import { AuthCredentials } from "../types/user";
+import dotenv from "dotenv";
+
+dotenv.config();
+const JWT_SECRET: Secret = process.env.JWT_SECRET!;
+const JWT_EXPIRES_IN = (process.env.JWT_EXPIRES_IN ?? "1h") as jwt.SignOptions["expiresIn"];
+
+export const registerUser = async ({ email, password }: AuthCredentials) => {
+  if (!email || !password) {
+    return { status: 400, data: { error: "Email e senha são obrigatórios" } };
+  }
+
+  const existingUser = await User.findOne({ email });
+  if (existingUser) {
+    return { status: 400, data: { error: "Usuário já existe" } };
+  }
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+  const newUser = new User({ email, password: hashedPassword });
+  await newUser.save();
+
+  const token = jwt.sign(
+    { id: newUser._id, email },
+    JWT_SECRET,
+    { expiresIn: JWT_EXPIRES_IN }
+  );
+
+  return {
+    status: 201,
+    data: { message: "Usuário criado com sucesso", token },
+  };
+};
+
+export const loginUser = async ({ email, password }: AuthCredentials) => {
+  if (!email || !password) {
+    return { status: 400, data: { error: "Email e senha são obrigatórios" } };
+  }
+
+  const user = await User.findOne({ email });
+  if (!user) {
+    return { status: 400, data: { error: "Usuário não encontrado" } };
+  }
+
+  const isMatch = await bcrypt.compare(password, user.password);
+  if (!isMatch) {
+    return { status: 400, data: { error: "Senha incorreta" } };
+  }
+
+  const token = jwt.sign(
+    { id: user._id, email },
+    JWT_SECRET,
+    { expiresIn: JWT_EXPIRES_IN }
+  );
+
+  return {
+    status: 200,
+    data: { message: "Login realizado com sucesso", token },
+  };
+};
