@@ -10,12 +10,12 @@ const JWT_EXPIRES_IN = (process.env.JWT_EXPIRES_IN ?? "1h") as jwt.SignOptions["
 
 export const registerUser = async ({ email, password }: AuthCredentials) => {
   if (!email || !password) {
-    return { status: 400, data: { error: "Email e senha são obrigatórios" } };
+    return { status: 400, data: { error: "Email and password are required." } };
   }
 
   const existingUser = await User.findOne({ email });
   if (existingUser) {
-    return { status: 400, data: { error: "Usuário já existe" } };
+    return { status: 400, data: { error: "User already exists." } };
   }
 
   const hashedPassword = await bcrypt.hash(password, 10);
@@ -30,23 +30,23 @@ export const registerUser = async ({ email, password }: AuthCredentials) => {
 
   return {
     status: 201,
-    data: { message: "Usuário criado com sucesso", token },
+    data: { message: "User created successfully.", token },
   };
 };
 
 export const loginUser = async ({ email, password }: AuthCredentials) => {
   if (!email || !password) {
-    return { status: 400, data: { error: "Email e senha são obrigatórios" } };
+    return { status: 400, data: { error: "Email and password are required." } };
   }
 
   const user = await User.findOne({ email });
   if (!user) {
-    return { status: 400, data: { error: "Usuário não encontrado" } };
+    return { status: 400, data: { error: "User not found." } };
   }
 
   const isMatch = await bcrypt.compare(password, user.password);
   if (!isMatch) {
-    return { status: 400, data: { error: "Senha incorreta" } };
+    return { status: 400, data: { error: "Incorrect password." } };
   }
 
   const token = jwt.sign(
@@ -57,6 +57,6 @@ export const loginUser = async ({ email, password }: AuthCredentials) => {
 
   return {
     status: 200,
-    data: { message: "Login realizado com sucesso", token },
+    data: { message: "Login successful.", token },
   };
 };

@@ -1,11 +1,11 @@
-# Dependências
+# Dependencies
 node_modules/
 
-# Build compilado
+# Compiled build
 dist/
 build/
 
-# Variáveis de ambiente
+# Environment variables
 .env
 .env.local
 .env.development
@@ -20,13 +20,13 @@ yarn-error.log*
 .cache/
 .temp/
 
-# Sistema
+# System files
 .DS_Store
 Thumbs.db
 
-# IDEs
+# IDE settings
 .vscode/
 .idea/
 
-# Arquivos diversos
+# Miscellaneous files
 *.log

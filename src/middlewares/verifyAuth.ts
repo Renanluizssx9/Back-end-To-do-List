@@ -16,12 +16,12 @@ router.post("/register", async (req: Request, res: Response) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      return res.status(400).json({ error: "Email e senha são obrigatórios" });
+      return res.status(400).json({ error: "Email and password are required." });
     }
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(400).json({ error: "Usuário já existe" });
+      return res.status(400).json({ error: "User already exists." });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -36,12 +36,12 @@ router.post("/register", async (req: Request, res: Response) => {
     );
 
     res.status(201).json({
-      message: "Usuário criado com sucesso",
+      message: "User created successfully.",
       token,
     });
   } catch (err) {
-    console.error("Erro no registro:", err);
-    res.status(500).json({ error: "Erro interno no servidor" });
+    console.error("Registration error:", err);
+    res.status(500).json({ error: "Internal server error." });
   }
 });
 
@@ -50,17 +50,17 @@ router.post("/login", async (req: Request, res: Response) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      return res.status(400).json({ error: "Email e senha são obrigatórios" });
+      return res.status(400).json({ error: "Email and password are required." });
     }
 
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(400).json({ error: "Usuário não encontrado" });
+      return res.status(400).json({ error: "User not found." });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(400).json({ error: "Senha incorreta" });
+      return res.status(400).json({ error: "Incorrect password." });
     }
 
     const token = jwt.sign(
@@ -70,12 +70,12 @@ router.post("/login", async (req: Request, res: Response) => {
     );
 
     res.json({
-      message: "Login realizado com sucesso",
+      message: "Login successful.",
       token,
     });
   } catch (err) {
-    console.error("Erro no login:", err);
-    res.status(500).json({ error: "Erro interno no servidor" });
+    console.error("Login error:", err);
+    res.status(500).json({ error: "Internal server error." });
   }
 });
 
