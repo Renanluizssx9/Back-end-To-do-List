@@ -10,7 +10,7 @@ dotenv.config();
 const app = express();
  
 app.use(cors({
-  origin: 'https://todolisttyscript.netlify.app',
+  origin: 'https://to-do-list-fast-mode.netlify.app/',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   credentials: true
 }));
