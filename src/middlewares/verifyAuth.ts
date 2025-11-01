@@ -9,14 +9,17 @@ dotenv.config();
 const router = express.Router();
 
 const JWT_SECRET = process.env.JWT_SECRET || "default_secret";
-const JWT_EXPIRES_IN = (process.env.JWT_EXPIRES_IN as jwt.SignOptions["expiresIn"]) ?? "1h";
+const JWT_EXPIRES_IN =
+  (process.env.JWT_EXPIRES_IN as jwt.SignOptions["expiresIn"]) ?? "1h";
 
 router.post("/register", async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      return res.status(400).json({ error: "Email and password are required." });
+      return res
+        .status(400)
+        .json({ error: "Email and password are required." });
     }
 
     const existingUser = await User.findOne({ email });
@@ -50,7 +53,9 @@ router.post("/login", async (req: Request, res: Response) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      return res.status(400).json({ error: "Email and password are required." });
+      return res
+        .status(400)
+        .json({ error: "Email and password are required." });
     }
 
     const user = await User.findOne({ email });

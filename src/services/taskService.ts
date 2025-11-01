@@ -14,11 +14,9 @@ export const updateTask = async (
   taskId: string,
   data: TaskPayload
 ) => {
-  return await Task.findOneAndUpdate(
-    { _id: taskId, user: userId },
-    data,
-    { new: true }
-  );
+  return await Task.findOneAndUpdate({ _id: taskId, user: userId }, data, {
+    new: true,
+  });
 };
 
 export const deleteTask = async (userId: string, taskId: string) => {

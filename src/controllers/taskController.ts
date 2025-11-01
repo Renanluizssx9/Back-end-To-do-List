@@ -1,5 +1,10 @@
 import { Response } from "express";
-import { getTasks, createTask, updateTask, deleteTask } from "../services/taskService";
+import {
+  getTasks,
+  createTask,
+  updateTask,
+  deleteTask,
+} from "../services/taskService";
 import { AuthRequest } from "../types/auth";
 
 export const listTasks = async (req: AuthRequest, res: Response) => {

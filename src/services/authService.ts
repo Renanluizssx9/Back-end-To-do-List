@@ -6,7 +6,8 @@ import dotenv from "dotenv";
 
 dotenv.config();
 const JWT_SECRET: Secret = process.env.JWT_SECRET!;
-const JWT_EXPIRES_IN = (process.env.JWT_EXPIRES_IN ?? "1h") as jwt.SignOptions["expiresIn"];
+const JWT_EXPIRES_IN = (process.env.JWT_EXPIRES_IN ??
+  "1h") as jwt.SignOptions["expiresIn"];
 
 export const registerUser = async ({ email, password }: AuthCredentials) => {
   if (!email || !password) {
@@ -22,11 +23,9 @@ export const registerUser = async ({ email, password }: AuthCredentials) => {
   const newUser = new User({ email, password: hashedPassword });
   await newUser.save();
 
-  const token = jwt.sign(
-    { id: newUser._id, email },
-    JWT_SECRET,
-    { expiresIn: JWT_EXPIRES_IN }
-  );
+  const token = jwt.sign({ id: newUser._id, email }, JWT_SECRET, {
+    expiresIn: JWT_EXPIRES_IN,
+  });
 
   return {
     status: 201,
@@ -49,11 +48,9 @@ export const loginUser = async ({ email, password }: AuthCredentials) => {
     return { status: 400, data: { error: "Incorrect password." } };
   }
 
-  const token = jwt.sign(
-    { id: user._id, email },
-    JWT_SECRET,
-    { expiresIn: JWT_EXPIRES_IN }
-  );
+  const token = jwt.sign({ id: user._id, email }, JWT_SECRET, {
+    expiresIn: JWT_EXPIRES_IN,
+  });
 
   return {
     status: 200,
