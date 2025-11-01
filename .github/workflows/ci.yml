@@ -2,9 +2,9 @@ name: Backend CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, renan-luiz-development-environment]
   pull_request:
-    branches: [main]
+    branches: [main, renan-luiz-development-environment]
 
 jobs:
   build-and-test:
