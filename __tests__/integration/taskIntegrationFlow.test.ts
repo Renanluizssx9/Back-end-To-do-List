@@ -9,22 +9,25 @@ let taskId: string;
 beforeAll(async () => {
   await connect();
 
-  // Registro
   const registerRes = await request(app).post("/auth/register").send({
     email: "taskuser@example.com",
     password: "123456",
   });
 
   expect(registerRes.statusCode).toBe(201);
+  expect(registerRes.body).toHaveProperty("user");
+  expect(registerRes.body.user).toHaveProperty("_id");
+
   userId = registerRes.body.user._id;
 
-  // Login
   const loginRes = await request(app).post("/auth/login").send({
     email: "taskuser@example.com",
     password: "123456",
   });
 
   expect(loginRes.statusCode).toBe(200);
+  expect(loginRes.body).toHaveProperty("token");
+
   token = loginRes.body.token;
 });
 
@@ -36,7 +39,7 @@ describe("Task Integration Flow", () => {
       .post("/tasks")
       .set("Authorization", `Bearer ${token}`)
       .send({
-        title: "Tarefa de integração",
+        title: "Integration task",
         user: userId,
       });
 
@@ -44,6 +47,7 @@ describe("Task Integration Flow", () => {
     expect(res.body).toHaveProperty("title", "Integration task");
     expect(res.body).toHaveProperty("user", userId);
     expect(res.body).toHaveProperty("completed", false);
+
     taskId = res.body._id;
   });
 
@@ -55,7 +59,7 @@ describe("Task Integration Flow", () => {
     expect(res.statusCode).toBe(200);
     expect(Array.isArray(res.body)).toBe(true);
     expect(res.body.length).toBeGreaterThan(0);
-    expect(res.body[0]).toHaveProperty("title");
+    expect(res.body[0]).toHaveProperty("title", "Integration task");
   });
 
   it("should update the task", async () => {
