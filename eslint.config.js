@@ -1,8 +1,9 @@
-import plugin from "@typescript-eslint/eslint-plugin";
-import parser from "@typescript-eslint/parser";
-import globals from "globals";
+const plugin = require("@typescript-eslint/eslint-plugin");
+const parser = require("@typescript-eslint/parser");
+const globals = require("globals");
 
-export default [
+/** @type {import('eslint').Linter.FlatConfig[]} */
+module.exports = [
   {
     ignores: ["node_modules", "dist", ".next", "build"],
   },
