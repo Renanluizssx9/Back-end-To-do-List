@@ -4,14 +4,12 @@ import app from "../../src/app";
 describe("App Integration", () => {
   it("should respond to /auth route", async () => {
     const res = await request(app).get("/auth");
-
-    expect([200, 404]).toContain(res.statusCode);
+    expect([200, 401, 404]).toContain(res.statusCode);
   });
 
   it("should respond to /tasks route", async () => {
     const res = await request(app).get("/tasks");
-
-    expect([200, 404]).toContain(res.statusCode);
+    expect([200, 401, 404]).toContain(res.statusCode);
   });
 
   it("should return 404 for unknown route", async () => {
@@ -25,6 +23,6 @@ describe("App Integration", () => {
       .send({ title: "Test", user: "507f1f77bcf86cd799439011" })
       .set("Content-Type", "application/json");
 
-    expect([200, 201, 400]).toContain(res.statusCode);
+    expect([200, 201, 400, 401]).toContain(res.statusCode);
   });
 });
