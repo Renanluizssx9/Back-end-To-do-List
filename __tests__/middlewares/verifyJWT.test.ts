@@ -1,7 +1,8 @@
 import { authMiddleware } from "../../src/middlewares/verifyJWT";
 import jwt from "jsonwebtoken";
 import User from "../../src/models/userModel";
-
+import dotenv from "dotenv";
+dotenv.config({ path: ".env.test" });
 jest.mock("jsonwebtoken");
 jest.mock("../../src/models/userModel");
 

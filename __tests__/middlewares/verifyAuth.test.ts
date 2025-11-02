@@ -4,6 +4,8 @@ import authRouter from "../../src/routes/authRoutes";
 import User from "../../src/models/userModel";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
+dotenv.config({ path: ".env.test" });
 
 // Mocks
 jest.mock("../../src/models/userModel");
