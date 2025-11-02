@@ -25,7 +25,6 @@ export const authMiddleware = async (
   try {
     const decoded = jwt.verify(token, JWT_SECRET) as { id: string };
 
-    // ✅ Check if user still exists
     const user = await User.findById(decoded.id);
     if (!user) {
       return res.status(401).json({ error: "User no longer exists." });
