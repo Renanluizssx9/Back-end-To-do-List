@@ -1,5 +1,5 @@
 import bcrypt from "bcryptjs";
-import jwt, { SignOptions, Secret } from "jsonwebtoken";
+import jwt, { Secret } from "jsonwebtoken";
 import User from "../models/userModel";
 import { AuthCredentials } from "../types/user";
 import dotenv from "dotenv";
