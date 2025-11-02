@@ -1,6 +1,7 @@
 import request from "supertest";
 import app from "../../src/app";
 import { connect, close } from "../setup/db";
+import jwt from "jsonwebtoken";
 
 let token: string;
 let userId: string;
@@ -15,20 +16,12 @@ beforeAll(async () => {
   });
 
   expect(registerRes.statusCode).toBe(201);
-  expect(registerRes.body).toHaveProperty("user");
-  expect(registerRes.body.user).toHaveProperty("_id");
+  expect(registerRes.body).toHaveProperty("token");
 
-  userId = registerRes.body.user._id;
+  token = registerRes.body.token;
 
-  const loginRes = await request(app).post("/auth/login").send({
-    email: "taskuser@example.com",
-    password: "123456",
-  });
-
-  expect(loginRes.statusCode).toBe(200);
-  expect(loginRes.body).toHaveProperty("token");
-
-  token = loginRes.body.token;
+  const decoded = jwt.decode(token) as { id: string };
+  userId = decoded.id;
 });
 
 afterAll(async () => await close());
