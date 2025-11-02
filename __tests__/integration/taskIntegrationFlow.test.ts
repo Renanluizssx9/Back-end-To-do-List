@@ -1,0 +1,89 @@
+import request from "supertest";
+import app from "../../src/app";
+import { connect, close } from "../setup/db";
+
+let token: string;
+let userId: string;
+let taskId: string;
+
+beforeAll(async () => {
+  await connect();
+
+  // Registro
+  const registerRes = await request(app).post("/auth/register").send({
+    email: "taskuser@example.com",
+    password: "123456",
+  });
+
+  expect(registerRes.statusCode).toBe(201);
+  userId = registerRes.body.user._id;
+
+  // Login
+  const loginRes = await request(app).post("/auth/login").send({
+    email: "taskuser@example.com",
+    password: "123456",
+  });
+
+  expect(loginRes.statusCode).toBe(200);
+  token = loginRes.body.token;
+});
+
+afterAll(async () => await close());
+
+describe("Task Integration Flow", () => {
+  it("should create a task", async () => {
+    const res = await request(app)
+      .post("/tasks")
+      .set("Authorization", `Bearer ${token}`)
+      .send({
+        title: "Tarefa de integração",
+        user: userId,
+      });
+
+    expect(res.statusCode).toBe(201);
+    expect(res.body).toHaveProperty("title", "Integration task");
+    expect(res.body).toHaveProperty("user", userId);
+    expect(res.body).toHaveProperty("completed", false);
+    taskId = res.body._id;
+  });
+
+  it("should list tasks for the user", async () => {
+    const res = await request(app)
+      .get("/tasks")
+      .set("Authorization", `Bearer ${token}`);
+
+    expect(res.statusCode).toBe(200);
+    expect(Array.isArray(res.body)).toBe(true);
+    expect(res.body.length).toBeGreaterThan(0);
+    expect(res.body[0]).toHaveProperty("title");
+  });
+
+  it("should update the task", async () => {
+    const res = await request(app)
+      .put(`/tasks/${taskId}`)
+      .set("Authorization", `Bearer ${token}`)
+      .send({ completed: true });
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body).toHaveProperty("completed", true);
+  });
+
+  it("should delete the task", async () => {
+    const res = await request(app)
+      .delete(`/tasks/${taskId}`)
+      .set("Authorization", `Bearer ${token}`);
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body).toHaveProperty("message");
+  });
+
+  it("should return empty list after deletion", async () => {
+    const res = await request(app)
+      .get("/tasks")
+      .set("Authorization", `Bearer ${token}`);
+
+    expect(res.statusCode).toBe(200);
+    expect(Array.isArray(res.body)).toBe(true);
+    expect(res.body.length).toBe(0);
+  });
+});
