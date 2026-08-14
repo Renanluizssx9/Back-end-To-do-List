@@ -3,10 +3,12 @@ import jwt from "jsonwebtoken";
 import User from "../models/userModel";
 import { AuthRequest } from "../types/auth";
 
-const JWT_SECRET = process.env.JWT_SECRET;
-
-if (!JWT_SECRET) {
-  throw new Error("JWT_SECRET not defined. Check your .env file.");
+function getJwtSecret(): string {
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    throw new Error("JWT_SECRET not defined. Check your .env file.");
+  }
+  return secret;
 }
 
 export const authMiddleware = async (
@@ -23,7 +25,7 @@ export const authMiddleware = async (
   const token = authHeader.split(" ")[1];
 
   try {
-    const decoded = jwt.verify(token, JWT_SECRET) as { id: string };
+    const decoded = jwt.verify(token, getJwtSecret()) as { id: string };
 
     const user = await User.findById(decoded.id);
     if (!user) {
